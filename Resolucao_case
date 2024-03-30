@@ -1,0 +1,105 @@
+Resolução do Case Técnico da Dadosfera para Analista de Dados Pleno. Vou trazendo os itens e minhas respostas:
+
+    -- Item 0 - Sobre Agilidade e Planejamento -- 
+Link para o fluxograma no Miro: https://miro.com/app/board/uXjVKa-o1yo=/?share_link_id=555098778453
+
+
+    -- Item 1 - Base de Dados utlizada -- 
+Utilizei uma base de vendas advinda de outro PS realizado, que foi subido ao S3. Depois foi conectado, documentado e catalogado na plataforma da Dadosfera. 
+São 8 bases, sendo 7 dimensão e 1 fato, com mais de 700.000 linhas.
+
+    -- Itens 2 e 3 - Integração e Exploração da base
+Originalmente a base estava armazenado em um banco de dados relacional (SQL Server). Baseado nisso, mantendo a base dentro do SGBD, e visando trabalhar com o tratamento
+no Power Query, análise e visualização de dados no Power BI, criaria um parâmetro para que sempre estivesse com os dados mais atualizados disponíveis.
+
+Nesse caso, criei a conexão entre o S3 e o dadosfera, com nome "Base de Vendas e-commerce". Os pipelines também, foram criados.
+O link de acesso à conexão segue: https://drive.google.com/file/d/1XUDx4sedZH7TzcMwPWPCCm5xLbpBNu8J/view?usp=drive_link
+
+
+    -- Itens 4 - Data Quality
+Montei o seguinte código:
+
+pip install great_expectations
+
+import great_expectations as gx
+import pandas as pd
+
+df = pd.read_csv('fVendas_velber.csv',sep=';')
+df.head()
+
+df_gx = gx.from_pandas(df)
+
+print(type(df_gx))
+df_gx.head()
+
+df_gx.validate()
+
+                                                            O resultado foi do teste dom great expectations foi
+
+  "success": true,
+  "results": [],
+  "evaluation_parameters": {},
+  "statistics": {
+    "evaluated_expectations": 0,
+    "successful_expectations": 0,
+    "unsuccessful_expectations": 0,
+    "success_percent": null
+  },
+  "meta": {
+    "great_expectations_version": "0.18.12",
+    "expectation_suite_name": "default",
+    "run_id": {
+      "run_name": null,
+      "run_time": "2024-03-29T18:31:38.576818-03:00"
+    },
+    "batch_kwargs": {
+      "ge_batch_id": "86498796-ee13-11ee-b6f5-706979a1dc46"
+    },
+    "batch_markers": {},
+    "batch_parameters": {},
+    "validation_time": "20240329T213138.566195Z",
+    "expectation_suite_meta": {
+      "great_expectations_version": "0.18.12"
+    }
+  }
+
+
+    -- Item 6 - Modelagem de Dados:
+
+Em relação á modelagem de dados, o modelo star schema é uma boa possibilidade de utilização, a partir da grande quantidade de tabelas dimensão existentes.
+
+Dividiria a modelagem em 3 etapas.
+
+*Camada de Staging:
+
+Armazeno os dados brutos extraídos dos sistemas de origem.
+Faço a limpeza, transformação e validação dos dados.
+Preparo os dados para serem carregados na camada de Data Vault.
+
+*Camada de Data Vault:
+
+Armazeno os dados históricos de forma granular e não modificável.
+Utilizo um modelo de chave composta para garantir a integridade dos dados.
+Posso integrar de dados de diferentes fontes.
+
+*Camada de Data Mart:
+
+Armazeno os dados agregados e sumarizados para fins analíticos.
+Posso utilizar cubos OLAP e/ou star schemas.
+Facilita a consulta e análise dos dados.
+
+      -- Item 7 - Análise de Dados:
+O dashboard criado para análise e entrega de insigths foi realizado no Power BI e catalogado no Dadosfera.
+Link do dash: https://app.powerbi.com/view?r=eyJrIjoiMTM5NGM5MTUtM2I0NC00MTAzLThiYTQtMDk5ODBiMzE2ZmM4IiwidCI6ImFkMzA0NjYxLWY2Y2UtNGI3OS1hMWJkLTE0ZmQ4OWE4Y2M1NiJ9
+Armazenei as bases na minha pasta dentro do Metabase
+Link: https://metabase-treinamentos.dadosfera.ai/collection/413-velber-nogueira-032024
+
+
+
+    -- Itens  8 e 9  - Pipelines e DataApps
+O link do Stepsfera não estava funcionando e não tinha acesso ao módulo de inteligência para explorar uma solução, como a do vídeo, por exemplo de como rodar 
+um Data App e como criar um ativo de Dados com o Data App direto na Dadosfera
+
+
+    -- Item 10 - Apresentação do Case
+Link do vídeo: https://youtu.be/ZuPJvJIB7mc
